@@ -10,6 +10,18 @@ import os
 """
 pearson(uses[1],users[133])
 """
+
+def euclidean(rating1,rating2):
+	interact=dict()
+	for key in rating1:
+		if key in rating2:
+			interact[key]=1
+	n=len(interact)
+	if n==0:
+		return 0
+	sum_euc=sum([pow(rating1[key],2)-pow(rating2[key],2) for key in interact])
+	return 1/(1+sqrt(sum_euc))
+
 def pearson(rating1, rating2):
 	interact=dict()
 	for key in rating1:
