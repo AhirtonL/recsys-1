@@ -1,0 +1,17 @@
+测试ua.test的结果:
+User-based CF 
+  相似度方法        RMSE        预测评分文件(./ml-100k) 
+  欧式距离          0.9747      prediction_ua_euclidean.txt
+  余弦相似度        0.9744      prediction_ua_cosine.txt
+  修正余弦相似度    0.9721      prediction_ua_adjust_cosine.txt
+  皮尔逊相关系数    0.9652      prediction_ua_pearson.txt
+
+
+Item-based CF
+
+
+
+
+
+SVD
+

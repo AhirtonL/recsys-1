@@ -1,5 +1,4 @@
 from __future__ import division
-from data import Data
 from operator import itemgetter 
 from math import sqrt
 from math import pow
@@ -19,8 +18,9 @@ def euclidean(rating1,rating2):
 	n=len(interact)
 	if n==0:
 		return 0
-	sum_euc=sum([pow(rating1[key],2)-pow(rating2[key],2) for key in interact])
-	return 1/(1+sqrt(sum_euc))
+	sum_euc=sum([pow(rating1[key]-rating2[key],2) for key in interact])
+
+	return 1.0/(1+sqrt(sum_euc))
 
 def pearson(rating1, rating2):
 	interact=dict()
@@ -105,7 +105,6 @@ def getTopKMatches(users,u,K=10,similarity=pearson):
 	return W[0:K]
 
 #recommend rated movies to a user u:<itemid,predicted rating>
-#wrong method
 def recommendation(users,u,K=10,similarity=pearson):
 	ranks=dict()
 	norms=dict()
@@ -182,6 +181,9 @@ def test():
 	trainfile=os.getcwd()+os.sep+'ml-100k'+os.sep+'ua.base'
 	testfile=os.getcwd()+os.sep+'ml-100k'+os.sep+'ua.test'
 
+
+	# trainfile=os.getcwd()+os.sep+'ra.train'
+	# testfile=os.getcwd()+os.sep+'ra.test'
 	print 'Train data loading started : ' + trainfile
 	print '...'
 	trains=dict()
@@ -189,7 +191,6 @@ def test():
 	
 	for line in open(trainfile):
 		spl=line.strip().split()
-
 		#spl=line.strip().split('::')
 		if 4==len(spl):
 				userid,itemid,rating,ts=spl
@@ -209,7 +210,7 @@ def test():
 			tests.setdefault(int(userid),{})[int(itemid)]=float(rating)	
 	print 'Test data loading finished : ' + testfile+'\n'
 	# print 'TopKMatches list(user,similarity_pearson) :'
-	# top=getTopKMatches(trains,1,5)
+	# top=getTopKMatches(trains,1,10)
 	# for index,item in enumerate(top) :
 	# 	print item
 
@@ -223,12 +224,16 @@ def test():
 
 	#predict(trains,tests,6)
 	print '\n'+'Prediction...'
+	# ave_u=average(tests[1])
+	# pred=predict_knn(trains,tests,1,ave_u)
+	# print pred
 	true_val=[]
 	pred_val=[]
-	out=open('./ml-100k/prediction_ra.txt','w')
+	
 	for user,item in tests.items():
 		ave_u=average(tests[user])
-		res=recommendation(trains,user)	
+		#res=recommendation(trains,user,similarity=cosine)
+		res=recommendation(trains,user,similarity=euclidean)	
 		pred=predict(trains,tests,user,ave_u,res)
 		for item,val in sorted(tests[user].items(),key=itemgetter(0)):
 			true_val.append(val)
@@ -242,12 +247,34 @@ def test():
 					pr_right=pred[item]
 			else :
 				pred_val.append(val)
-			#s=' '.join([str(user),str(item),str(pr_right)])
-			#out.write(s+'\n')
-	#out.close()
 	print len(pred_val)	
+
+	# out=open('./ml-100k/prediction_ra_1.txt','w')
+	# for user,item in tests.items():
+	# 	ave_u=average(tests[user])
+	# 	#res=recommendation(trains,user)	
+	# 	pred=predict_knn(trains,tests,user,ave_u)
+	# 	print len(pred)
+	# 	for item,val in sorted(tests[user].items(),key=itemgetter(0)):
+	# 		true_val.append(val)
+	# 		pr_right=val
+	# 		if item in pred.keys():
+	# 			if pred[item] <1 :
+	# 				pred_val.append(1)
+	# 				pr_right=1
+	# 			else :
+	# 				pred_val.append(int(pred[item]))
+	# 				pr_right=pred[item]
+	# 		else :
+	# 			pred_val.append(val)
+	# #out.close()
+	# print len(pred_val)	
+
+
+
     
 	i=0
+	out=open('./ml-100k/prediction_ra_euclidean.txt','w')
 	for line in open(testfile):
 		spl=line.strip().split()
 		#spl=line.strip().split('::')
