@@ -36,6 +36,50 @@ def pearson(rating1, rating2):
 		else:
 			return val
 
+def cosine(rating1,rating2):
+	interact=dict()
+	for key in rating1:
+		if key in rating2:
+			interact[key]=1
+	n=len(interact)
+	if n==0:
+		return 0
+	sum_x2 =sum([pow(rating1[key],2) for key in interact])
+	sum_y2 =sum([pow(rating2[key],2) for key in interact])
+	sum_xy =sum([rating1[key]*rating2[key] for key in interact])
+	return sum_xy/(sqrt(sum_x2)*sqrt(sum_y2))
+
+
+
+def adjust_cosine(rating1,rating2):
+	interact=dict()
+	for key in rating1:
+		if key in rating2:
+			interact[key]=1
+	n=len(interact)
+	if n==0:
+		return 0
+	ave_x_y=dict()
+	for key in interact:
+		ave_x_y.setdefault(key,0)
+		ave_x_y[key] =(rating1[key]+rating2[key])/n
+
+	sum_x2 =sum([pow(rating1[key]-ave_x_y[key],2) for key in interact])
+	sum_y2 =sum([pow(rating2[key]-ave_x_y[key],2) for key in interact])
+	sum_xy =sum([(rating1[key]-ave_x_y[key])*(rating2[key]-ave_x_y[key]) for key in interact])
+	denominator=sqrt(sum_x2)*sqrt(sum_y2)
+	if denominator == 0:
+		return 0
+	else:
+		val=sum_xy/denominator
+		if val<-1:
+			return -1
+		elif val >1:
+			return 1
+		else:
+			return val
+
+
 #get the average rank of one user
 def average(rating):
 	sum_ave=sum([rating[key] for key in rating])
