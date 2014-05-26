@@ -88,9 +88,10 @@ def predict(users,tests,u,ave_u,res):
 				pred[item] =int(round(ave_u+dict(res)[item]))
 	return pred
 
-def predict_knn(users,tests,u,K=10,similarity=pearson):
+def predict_knn(users,tests,u,ave_u,K=10):
 	ranks=dict()
 	norms=dict()
+	pred=dict()
 	neighbors=getTopKMatches(users,u,K=10)
 	for item,real in tests[u].items():
 		if u in users:
@@ -103,10 +104,9 @@ def predict_knn(users,tests,u,K=10,similarity=pearson):
 					ranks[item] +=simi_v*(users[v][item]-ave_v)
 					norms.setdefault(item,0)
 					norms[item] +=simi_v
-	rankings=[(item,sum_rank/norms[item]) for item,sum_rank in ranks.items()]
-	rankings.sort(key=itemgetter(0))
-	rankings.reverse()
-	return rankings
+	for item,sum_rank in ranks.items():
+		pred[item]=int(round(ave_u+sum_rank/norms[item]))
+	return pred
 	
 #predict the rating given the userid u and movieid id 
 def predict_user_item(users,tests,u,id,ave_u,res):
